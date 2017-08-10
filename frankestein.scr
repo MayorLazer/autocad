@@ -1,0 +1,99 @@
+;<-- Main -->
+(defun c:zapatilla ()
+  (ALERT " Creador de Zapatillas Electricas 3000.")
+  (command "ucs" "w")
+  (command "erase" "all" "" "")
+  (command "plan" "")
+  (command "surftab1" 20)
+  (command "surftab2" 20)
+  (command "isolines" 20)
+  (command "-layer" "make" "Cable" "c" 10 "" "")
+  (command "-layer" "make" "Cuerpo" "c" 130 "" "")
+  (command "-layer" "make" "Enchufe" "c" 2 "" "")
+  (command "-layer" "make" "Interruptor" "c" 20 "" "")
+  (command "-layer" "make" "Corriente" "c" 280 "" "")
+  (command "-layer" "make" "Fusible" "c" 320 "" "")
+  (command "-layer" "set" "0" "")
+  (command "shade" "")
+  (command "vpoint" "1,-1,1")
+  (dibuja_zapatilla)
+  (command "zoom" "extents")
+  (command "shade" "")
+  (ALERT " Su zapatilla ha sido creada, contemple su obra ")
+  (ALERT " Integrantes: Belu Martorell, Lozando, Yoris")
+  (princ)
+
+  )
+; <-- Funcion dibuja zapatilla -->
+(defun dibuja_zapatilla ()
+
+  (ALERT "Cual es el punto de insercion? -> ")
+  (setq puntoin (getpoint "Punto seleccionado: \n"))
+
+  (eleccion_cant)
+;;;  (setq Tamanio (ENTLAST))
+  (eleccion_conector cant)
+;;;  (setq Conector (ENTLAST))
+  (eleccion_forma puntoin largo)
+;;;  (setq Froma (ENTLAST))
+  (eleccion_fusible largo)
+;;;  (setq Cubre (ENTLAST))
+  (eleccion_enchufe puntoin largo)
+;;;  (setq Enchufe (ENTLAST))
+)
+;<-- Eleccion Conector -->
+(ALERT "Seleccione la forma deseada")
+(initget  "Normal, Redonda, Corte, Manija") ;Ver como hace para seleccionar el condicional con una letra
+(setq opF (getstring "Grande/Estandar :\n"))
+(cond
+  (= opF "N")
+  (= opF "R"); Ver como se hace 2 lineas post if
+  (= opF "G")
+  (= opF "M")
+)
+;<-- Eleccion Fusible -->
+(ALERT "Seleccione la forma deseada")
+(initget  "Normal, Redonda, Corte, Manija") ;Ver como hace para seleccionar el condicional con una letra
+(setq opF (getstring "Grande/Estandar :\n"))
+(cond
+  (= opF "N")
+  (= opF "R"); Ver como se hace 2 lineas post if
+  (= opF "G")
+  (= opF "M")
+)
+;<-- Eleccion Forma -->
+(defun eleccion_forma (puntoin enchu_cant enchu_form)
+  (ALERT "Seleccione forma de la zapatilla..\n N-> Normal \n R-> Redonda \n C-> Corte \n M-> Manija")
+  (initget " N, R, C, M ")
+
+  (setq opM (getstring "T/Box/Cilindro/Agarradera :\n"))
+
+  (cond
+    ((= opM "N") (zapa_normal enchu_cant enchu_form))
+    ((= opM "R") (zapa_redonda enchu_cant enchu_form))
+    ((= opM "C") (zapa_corte enchu_cant enchu_form))
+    ((= opM "M") (zapa_manija enchu_cant enchu_form))
+  )
+)
+;<-- Eleccion Tamanio -->
+(ALERT "Seleccione la forma deseada")
+(initget  "Normal, Redonda, Corte, Manija") ;Ver como hace para seleccionar el condicional con una letra
+(setq opF (getstring "Grande/Estandar :\n"))
+(cond
+  (= opF "N")
+  (= opF "R"); Ver como se hace 2 lineas post if
+  (= opF "G")
+  (= opF "M")
+)
+;<-- Eleccion Enfuche -->
+(ALERT "Seleccione la forma deseada")
+(initget  "Normal, Redonda, Corte, Manija") ;Ver como hace para seleccionar el condicional con una letra
+(setq opF (getstring "Grande/Estandar :\n"))
+(cond
+  (= opF "N")
+  (= opF "R"); Ver como se hace 2 lineas post if
+  (= opF "G")
+  (= opF "M")
+)
+
+;<<<---------------- /// DIBUJOS /// ---------------------->>>

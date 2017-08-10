@@ -1,0 +1,668 @@
+;<-- Main -->
+(defun c:zapatilla ()
+  (ALERT " Creador de Zapatillas Electricas 3000.")
+  (command "ucs" "w")
+  (command "erase" "all" "" "")
+  (command "plan" "")
+  (command "surftab1" 20)
+  (command "surftab2" 20)
+  (command "isolines" 20)
+  (command "-layer" "make" "Cable" "c" 10 "" "")
+  (command "-layer" "make" "Cuerpo" "c" 130 "" "")
+  (command "-layer" "make" "Enchufe" "c" 2 "" "")
+  (command "-layer" "make" "Interruptor" "c" 220 "" "")
+  (command "-layer" "make" "Corriente" "c" 220 "" "")
+  (command "-layer" "set" "0" "")
+  (command "shade" "")
+  (command "vpoint" "1,-1,1")
+  (dibuja_zapatilla)
+  (command "zoom" "extents")
+  (command "shade" "")
+  (ALERT " Su zapatilla ha sido creada, contemple su obra ")
+  (ALERT " Integrantes:...")
+  (princ)
+
+  )
+
+; <-- Funcion que dibuja zapatilla -->
+(defun dibuja_zapatilla ()
+  (ALERT "Cual es el punto de inserción? -> ")
+  (setq puntoin (getpoint "Punto seleccionado: \n"))
+  (ALERT "Seleccione la forma deseada (Inicial)")
+  (initget  "Rectangular , Cuadrada, Arcoiris")
+  (setq opT (getstring "Grande/Estandar :\n"))
+  (cond
+    (= opT "G")
+    (= opT "C"); Ver como se hace 2 lineas post if
+    (= opT "A")
+  )
+  (setq puntoinV(list (car puntoin) (cadr puntoin) (+ (caddr puntoin) (* largo 0.40))))
+  (setq puntoinP(list (car puntoin) (cadr puntoin) (+ (caddr puntoin) (* largo 0.85))))
+  (eleccion_mango puntoin largo)
+;;;  (setq Mango (ENTLAST))
+  (eleccion_vastago puntoinV largo)
+;;;  (setq Vastago (ENTLAST))
+  (eleccion_cubrevastago puntoinV largo)
+;;;  (setq Cubre (ENTLAST))
+  (eleccion_punta puntoinP largo)
+;;;  (setq Punta (ENTLAST))
+;;;  (command "union" Mango Vastago Cubre Punta "")
+
+)
+;;;;-------------------------********------------------------
+;;;;-----------//FUNCIONES DE ELECCIONES//-----------
+;;;;-------------------------********------------------------
+
+
+;------------///  ELECCION MANGOS ///------------------
+(defun eleccion_mango (puntoin largo)
+  (ALERT "Seleccione tipo de mango..")
+  (initget " T, B , C , A ")
+
+;;;  (setq opM (GETKWORD "T/Box/Cilindro/Agarradera :\n"))
+
+  (setq opM (getstring "T/Box/Cilindro/Agarradera :\n"))
+
+  (cond
+    ((= opM "T") (mango_T puntoin largo))
+    ((= opM "B") (mango_box puntoin largo))
+    ((= opM "C") (mango_cilindro puntoin largo))
+    ((= opM "A") (mango_agarradera puntoin largo))
+  )
+)
+;------------///  ELECCION VASTAGO ///------------------
+(defun eleccion_vastago (puntoinV largo)
+  (ALERT "Seleccione tipo de vastago")
+  (initget " CI , R ")
+
+;;; (setq opV (GETKWORD "Circular/Rectangular :\n"))
+
+  (setq opV (getstring "CIrcular/Rectangular :\n"))
+
+  (cond
+    ((= opV "CI") (vastago_cilindro puntoinV largo))
+    ((= opV "R") (vastago_rectangulo puntoinV largo))
+  )
+)
+;------------///  ELECCION CUBRE VASTAGO ///------------------
+(defun eleccion_cubrevastago (puntoinV largo)
+  (ALERT "Desea cubre vastago?..")
+  (initget  "SI , NO")
+
+;;;(setq opCV (GETKWORD "Con cubre vastago : SI/NO \n"))
+
+  (setq opCV (getstring "Con cubre vastago : SI/NO \n"))
+
+  (cond
+    ((= opCV "SI") (cubre_vastago puntoinV largo))
+    ((= opCV "NO") "nil")
+  )
+)
+;------------///  ELECCION PUNTA ///------------------
+(defun eleccion_punta (puntoinP largo)
+  (ALERT "Seleccione tipo de punta..")
+  (initget  "P, AL, PH , TO")
+
+;;;(setq opP (GETKWORD"Plana/Alien/PHilips/Torx :\n"))
+
+  (setq opP (getstring"Plana/ALien/PHilips/TOrx :\n"))
+
+  (cond
+    ((= opP "P") (punta_plana puntoinP largo))
+    ((= opP "AL") (punta_alien puntoinP largo))
+    ((= opP "PH") (punta_philips puntoinP largo))
+    ((= opP "TO") (punta_torx puntoinP largo))
+  )
+)
+
+
+;********************************************
+;------------/// MANGOS ///------------------
+
+;********************************************
+;MANGO T
+;********************************************
+
+(defun mango_t(ptoi largo)
+
+  (command "-layer" "set" "MANGO" "")
+
+  (setq largomango (* largo 0.40))
+
+  (setq radiomango  (* largo 0.07))
+
+  (setq largom (- largomango (* radiomango 2)))
+
+  (setq pto1 (list (+ (car ptoi) radiomango) (- (cadr ptoi) (/ largomango 2)) (caddr ptoi)))
+
+  (command "box" pto1 "L" (- (* radiomango 2)) largomango (* radiomango 2))
+
+  (setq box (ENTLAST))
+
+  (setq pto2 (list (- (car pto1) radiomango)  (cadr pto1) (+ (caddr pto1) radiomango)))
+
+  (command "-layer" "M" "ESFERAS" "C" "2" "" "")
+
+  (command "sphere" pto2 radiomango)
+
+  (setq esfera (ENTLAST))
+
+  (command "array" esfera "" "P" ptoi "2" "" "" "")
+
+  (setq esferas (ssget "x" '((8 . "ESFERAS"))))
+
+  (command "subtract" box "" esferas "")
+
+  (setq premango (ENTLAST))
+
+  (command "-layer" "set" "MANGO" "")
+
+  (setq pto3 (list (car ptoi) (cadr ptoi) (+ (caddr ptoi) (* radiomango 2))))
+
+  (command "cylinder" pto3 radiomango (- largomango (* radiomango 2)) )
+
+  (setq cilindro (ENTLAST))
+
+  (command "union" cilindro premango "")
+
+  (setq ptof (list (car ptoi) (cadr ptoi) (caddr ptoi)))
+)
+
+;********************************************
+;MANGO BOX
+;********************************************
+
+( defun mango_box(ptoi largo)
+
+  (command "-layer" "set" "MANGO" "")
+
+  (setq largomango (* largo 0.40))
+
+  (setq radiomango  (* largo 0.07))
+
+  (setq pto1 (list (- (car ptoi) radiomango) (- (cadr ptoi) radiomango)  (caddr ptoi)))
+
+  (setq pbox (* radiomango 2))
+
+  (command "box" pto1 "L" pbox pbox largomango)
+
+  (setq ptobox (entlast))
+
+  (setq pto2 (list (car ptoi)  (cadr ptoi) (+ (caddr ptoi) (* largomango 0.80))))
+
+  (setq ratutoro (* largomango 0.07))
+
+  (command "torus" pto2 ( / pbox 1.5) ratutoro)
+
+  (setq ptotoroide(entlast))
+
+  (command "subtract" ptobox "" ptotoroide "")
+
+  (setq ptof (list (car ptoi) (cadr ptoi) (+ (caddr ptoi) largomango)))
+)
+
+
+;********************************************
+;MANGO CILINDRO
+;********************************************
+
+( defun mango_cilindro(ptoi largo)
+
+  (command "-layer" "set" "MANGO" "")
+
+  (setq radiomango  (* largo 0.07))
+
+  (setq largomango (* largo 0.40))
+
+  (command "cylinder" ptoi radiomango largomango)
+
+  (setq cilindro(entlast))
+
+  (command "-layer" "M" "TOROIDE" "C" "2" "" "")
+
+  (setq pto1 (list  (car ptoi)  (cadr ptoi)  (+ (caddr ptoi) (* largomango 0.20))))
+
+  (command "torus" pto1 radiomango "D" (* largomango 0.05))
+
+  (setq pto2 (list  (car pto1)  (cadr pto1)  (+ (caddr pto1) (* largomango 0.20))))
+
+  (command "torus" pto2 radiomango "D" (* largomango 0.05))
+
+  (setq pto3 (list  (car pto2)  (cadr pto2)  (+ (caddr pto2) (* largomango 0.20))))
+
+  (command "torus" pto3 radiomango "D" (* largomango 0.05))
+
+  (setq pto4 (list  (car pto3)  (cadr pto3)  (+ (caddr pto3) (* largomango 0.20))))
+
+  (command "torus" pto4 radiomango "D" (* largomango 0.05))
+
+  (setq toroides (ssget "x" '((8 . "TOROIDE"))))
+
+  (command "subtract" cilindro "" toroides"")
+
+  (setq premango(ENTLAST))
+
+  (command "_layer" "S" "0" "" "")
+
+  (command "sphere" ptoi radiomango)
+
+  (setq esfera (ENTLAST))
+
+  (command "union" premango esfera "")
+
+  (setq ptof (list (car ptoi) (cadr ptoi) (+ (caddr ptoi) largomango)))
+)
+
+
+;********************************************
+;MANGO AGARRADERA
+;********************************************
+
+(defun mango_agarradera(ptoi largo)
+
+  (command "-layer" "set" "MANGO" "")
+
+  (setq radiomango  (* largo 0.07))
+
+  (setq largomango (* largo 0.40))
+
+  (command "cylinder" ptoi radiomango largomango)
+
+  (setq cilindro(entlast))
+
+  (command "sphere" ptoi radiomango)
+
+  (setq esfera (ENTLAST))
+
+  (command "union" esfera cilindro "" )
+
+  (setq premango (ENTLAST))
+
+  (setq pto1 (list (+ (car ptoi) radiomango)  (cadr ptoi)  (caddr ptoi) ))
+
+  (setq radiocilpeque (* largomango 0.02))
+
+  (command "-layer" "M" "AGARRADERA" "C" "2" "" "")
+
+  (command "cylinder" pto1 radiocilpeque largomango )
+
+  (setq cilpeques (ENTLAST))
+
+
+  (command "array" cilpeques "" "P" ptoi "8" "" "")
+
+  (setq cilindritos (ssget "x" '((8 . "AGARRADERA"))))
+
+  (command "subtract" premango "" cilindritos "")
+
+  (setq agarradera (ENTLAST))
+
+  (command "_layer" "S" "0" "" "")
+
+  (setq pto2 (list  (car ptoi)  (cadr ptoi)  (+ (caddr ptoi) (* largomango 0.80))))
+
+  (command "torus" pto2 radiomango "D" (* largomango 0.05))
+
+  (setq ptotoroide(entlast))
+
+  (command "subtract" agarradera "" ptotoroide "")
+
+  (setq ptof (list (car ptoi) (cadr ptoi) (+ (caddr ptoi) largomango)))
+)
+
+
+
+;++++++++++++++++++++++++++++++++++++++++++++
+;------------/// VASTAGOS ///------------------
+
+
+;********************************************
+;VASTAGO CILINDRO
+;********************************************
+
+(defun vastago_cilindro(ptoi largo)
+
+  (command "-layer" "set" "VASTAGO" "")
+
+  (setq largovastago (* largo 0.45))
+
+  (setq radiovastago  (* largo 0.03))
+
+  (command "cylinder" ptoi radiovastago largovastago)
+
+  (setq ptofv (list (car ptoi) (cadr ptoi) (+ (caddr ptoi) largovastago)))
+)
+
+
+;********************************************
+;VASTAGO RECTANGULO
+;********************************************
+
+(defun vastago_rectangulo(ptoi largo)
+
+  (command "-layer" "set" "VASTAGO" "")
+
+  (setq largovastago (* largo 0.45))
+
+  (setq ladocentro (* largo 0.03))
+
+  (setq pto1 (list (- (car ptoi) ladocentro) (- (cadr ptoi) ladocentro) (caddr ptoi)))
+
+
+  (setq ladosvastago (* ladocentro 2))
+
+
+  (command "box" pto1 "L" ladosvastago ladosvastago largovastago)
+
+
+  (setq ptofv (list (car ptoi) (cadr ptoi) (+ (caddr ptoi) largovastago)))
+)
+
+;********************************************
+;CUBRE VASTAGO
+;********************************************
+
+(defun cubre_vastago(ptoi largo)
+
+  (setq largocubre (* largo 0.40))
+
+  (setq radiocubre (* largo 0.05))
+
+  (command "-layer" "set" "CUBREVASTAGO" "")
+
+  (command "cylinder" ptoi radiocubre largocubre)
+  )
+;;;||||||||||||||||||||||||||||||||||||||||||||
+;;;------------/// PUNTAS ///------------------
+
+;********************************************
+;PUNTA ALIEN
+;********************************************
+
+(defun punta_alien(ptoi largo)
+
+  (setq radiopunta(* largo 0.03))
+
+  (setq largopunta (* largo 0.15))
+
+  (command "-layer" "set" "PUNTA" "")
+
+  (command "cylinder" ptoi radiopunta (* largopunta 0.25))
+
+  (setq CILINDRO(entlast))
+
+  (setq pto1 (list (car ptoi) (cadr ptoi) (+ (caddr ptoi) (* largopunta 0.25))))
+
+  (command "_polygon" "6" pto1 "" radiopunta )
+
+  (setq POLIGONO(entlast))
+
+  (command "extrude" POLIGONO "" (* largopunta 0.75) "")
+)
+;********************************************
+;PUNTA PLANA
+;********************************************
+
+(defun punta_plana(ptoi largo)
+
+  (command "-layer" "set" "PUNTA" "")
+
+  (setq radiopunta (* largo 0.03))
+
+  (setq largopunta (* largo 0.15))
+
+  (command "cylinder" ptoi radiopunta largopunta)
+
+  (setq cilindro(entlast))
+
+  (setq pto1 (list (+ (car ptoi) radiopunta) (cadr ptoi) (caddr ptoi)))
+
+  (setq pto2 (list (car pto1) (- (cadr pto1) radiopunta) (caddr pto1)))
+
+  (setq ptof (list (car ptoi) (cadr ptoi) (+ (caddr ptoi) largopunta)))
+
+  (setq pto3 (list (+ (car ptof) (* radiopunta 0.20)) (- (cadr ptof) radiopunta) (caddr ptof)))
+
+  (command "ucs" "new"  "3p" pto2 pto1 pto3 )
+
+  (command "-layer" "M" "BOX" "C" "2" "" "")
+
+  (command "box" "0,0,0" "L" (* radiopunta 2) (+ largopunta 5) largopunta)
+
+  (setq box (ENTLAST))
+
+  (command "ucs" "prev")
+
+  (command "array" box "" "P" ptoi "2" "" "")
+
+  (setq boxs (ssget "x" '((8 . "BOX"))))
+
+  (command "subtract" cilindro "" boxs "")
+)
+
+;********************************************
+;PUNTA PHILIPS
+;********************************************
+
+(defun punta_philips(ptoi largo)
+
+  (command "-layer" "set" "PUNTA" "")
+
+  (setq radiopunta (* largo 0.03))
+
+  (setq largopunta (* largo 0.15))
+
+  (command "cylinder" ptoi radiopunta largopunta)
+
+  (setq cilindro(entlast))
+
+  (setq pto1 (list (+ (car ptoi) radiopunta) (+ (cadr ptoi) (/ radiopunta 2)) (+ (caddr ptoi) (* largopunta 0.25))))
+
+  (setq pto2 (list (+ (car ptoi) radiopunta) (cadr ptoi) (+ (caddr ptoi) (* largopunta 0.25))))
+
+  (setq pto3 (list (car ptoi) (cadr ptoi) (+ (caddr ptoi) largopunta)))
+
+  (command "ucs" "n" "ZA" pto2 pto3)
+
+  (setq ptoa '( 0 0 0 ))
+
+  (setq ptob (list (+ (car ptoa) (/ radiopunta 2)) (+ (cadr ptoa) (/ radiopunta 2)) (caddr ptoa)))
+
+  (setq ptoc (list (car ptob) (+ (cadr ptob) radiopunta) (caddr ptob)))
+
+  (setq ptod (list (- (car ptoc)  radiopunta) (cadr ptoc) (caddr ptoc)))
+
+  (setq ptoe (list ( car ptod ) (- (cadr ptod) radiopunta) (caddr ptod)))
+
+  (command "-layer" "M" "CASITA" "C" "2" "" "")
+
+  (command "line" ptoa ptob "")
+
+  (setq l1 (ENTLAST))
+
+  (command "line" ptob ptoc "")
+
+  (setq l2 (ENTLAST))
+
+  (command "line" ptoc ptod "")
+
+  (setq l3 (ENTLAST))
+
+  (command "line" ptod ptoe "")
+
+  (setq l4 (ENTLAST))
+
+  (command "line" ptoe ptoa "")
+
+  (setq l5 (ENTLAST))
+
+  (command "pedit" l1 "" "j" l1 l2 l3 l4 l5 "" "")
+
+  (setq aux (entlast))
+
+  (command "extrude" aux "" 5  "" )
+
+  (setq casita(ENTLAST))
+
+  (command "ucs" "prev")
+
+  (command "array" casita "" "P" ptoi "4" "" "")
+
+  (setq casitas (ssget "x" '((8 . "CASITA"))))
+
+  (command "subtract" cilindro "" casitas "")
+
+  (setq prepunta (ENTLAST))
+
+  (setq ptoxpos (list (car ptoi) (cadr ptoi) (+ (caddr ptoi) largopunta)))
+
+  (setq ptocentro (list (car ptoxpos) (cadr ptoxpos) (- (caddr ptoxpos) (/ radiopunta 4))))
+
+  (setq ptoypos (list (car ptocentro) (+ (cadr ptocentro) (/ radiopunta 4))  (caddr ptocentro)))
+
+  (command "ucs" "n" "3p" ptocentro ptoxpos ptoypos)
+
+  (setq punto1 '(0 0 0))
+
+  (setq punto2 (list (+ (car punto1) (/ radiopunta 4)) (cadr punto1) (caddr punto1)))
+
+  (setq punto3 (list (car punto2) (+ (cadr punto2) radiopunta) (caddr punto2)))
+
+  (setq punto4 (list (- (car punto3) radiopunta) (cadr punto3) (caddr punto3)))
+
+  (setq punto5 (list (car punto1) (+ (cadr punto1) (/ radiopunta 4)) (caddr punto1)))
+
+  (command "line" punto1 punto2 "")
+
+  (setq l1 (ENTLAST))
+
+  (command "line" punto2 punto3 "")
+
+  (setq l2 (ENTLAST))
+
+  (command "line" punto3 punto4 "")
+
+  (setq l3 (ENTLAST))
+
+  (command "line" punto4 punto5  "")
+
+  (setq l4 (ENTLAST))
+
+  (command "line" punto5 punto1 "")
+
+  (setq l5 (ENTLAST))
+
+  (command "pedit" l1 "" "j" l1 l2 l3 l4 l5 "" "")
+
+  (setq aux (entlast))
+
+
+  (command "ucs" "prev")
+
+  (command "revolve" aux "" ptocentro ptoxpos "" )
+
+  (setq puntap (ENTLAST))
+
+  (command "subtract" prepunta "" puntap "")
+)
+
+;********************************************
+;PUNTA TORX
+;********************************************
+
+(defun punta_torx(ptoi largo)
+
+  (setq radiopunta(* largo 0.03))
+
+  (setq largopunta(* largo 0.15))
+
+  (command "-layer" "set" "PUNTA" "")
+
+  (command "cylinder" ptoi radiopunta largopunta)
+
+  (setq CILINDRO(ENTLAST))
+
+  (command "-layer" "M" "CASITA" "C" "2" "" "")
+
+  (setq ptoa (list (+ (car ptoi)  radiopunta)      (- (cadr ptoi) (+ (/ radiopunta 4) (/ radiopunta 3)))        (+ (caddr ptoi) largopunta) ))
+
+  (setq ptob (list (+ (car ptoi) (/ radiopunta 1.3))       (- (cadr ptoi) (/ radiopunta 4))             (+ (caddr ptoi) largopunta) ))
+
+  (setq ptoc (list (+ (car ptoi) (/ radiopunta 1.3))       (+ (cadr ptoi) (/ radiopunta 4))             (+ (caddr ptoi) largopunta) ))
+
+  (setq ptod (list (+ (car ptoi) radiopunta)      (+ (cadr ptoi) (+ (/ radiopunta 4) (/ radiopunta 3)))        (+ (caddr ptoi) largopunta) ))
+
+  (command "line"  ptoa ptob "" )
+
+  (setq l1(entlast))
+
+  (command "line"  ptob ptoc "" )
+
+  (setq l2(entlast))
+
+  (command "line"  ptoc ptod "")
+
+  (setq l3(entlast))
+
+  (command "line"  ptod ptoa "")
+
+  (setq l4(entlast))
+
+  (command "pedit" l1 "" "j" l1 l2 l3 l4 "" "")
+
+  (setq boxtriangulo (entlast))
+
+  (command "extrude" boxtriangulo "" (- (* largo 0.07)) "" )
+
+  (setq boxtriangulo(entlast))
+
+;/////////////// Haciendo triangulooooooo con cambio de ucs
+
+
+  (setq ladot ( + (/ radiopunta 3) (/ radiopunta 3.5)))
+
+  (setq ptoz (list      (car ptoi)        (cadr ptoi)       (+ (caddr ptoi) (/ (- largopunta (+ (* largopunta 0.07) ladot)) 2))  ))
+
+  (setq ptoc (list (+ (car ptoz) radiopunta)  (cadr ptoz) (caddr ptoz)))
+
+  (command "ucs" "n" "za" ptoc ptoz)
+
+  (setq ptoa1 '(0 0 0))
+
+  (setq ptoa2 (list (+ (car ptoa1) ladot ) (+ (cadr ptoa1) ladot) (caddr ptoa1)))
+
+  (setq ptoa3 (list (- (car ptoa1)  ladot ) (+ (cadr ptoa1) ladot)  (caddr ptoa1)))
+
+  (command "line"  ptoa1 ptoa2 "" )
+
+  (setq linea1(entlast))
+
+  (command "line"  ptoa2 ptoa3 "" )
+
+  (setq linea2(entlast))
+
+  (command "line"  ptoa3 ptoa1 "")
+
+  (setq linea3(entlast))
+
+  (command "pedit" linea1 "" "j" linea1 linea2 linea3  "" "")
+
+  (setq triangulo1 (entlast))
+
+  (command "extrude" triangulo1 ""  (* largo 0.01) "" )
+
+  (setq triangulo2(entlast))
+
+  (command "union" boxtriangulo triangulo2 "" )
+
+  (setq todojunto (entlast))
+
+  (command "ucs" "p" )
+
+  (command "array" todojunto "" "P" ptoi "6"  "" "" )
+
+  (setq flechitas (ssget "x" '((8 . "CASITA"))))
+
+  (command "subtract" CILINDRO "" flechitas "")
+
+)

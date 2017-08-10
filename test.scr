@@ -1,0 +1,15 @@
+(defun c:main ()
+  (setq osmodo (getvar "osmode"))
+  (setvar "osmode" 0)
+  (command "layer" "s" "0" "")
+  (command "ucs" "w")
+  ;;entrada de datos
+  (ALERT "Cual es el punto de insercion?")
+  (setq puntoin (getpoint "Punto seleccionado: \n"))
+
+  (command "rectangle" puntoin "@5,5")
+  (setq caraenchu (ENTLAST))
+
+
+(setvar "osmode" osmodo)
+)
