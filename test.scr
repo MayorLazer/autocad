@@ -43,14 +43,28 @@
   
   (command "sweep" postancho_cubre "" postlargo_cubre) ;crea el cubre
   (setq post_cubre (ENTLAST))
-  
-    ;<-- Union -->
-  (command "union" cable pre_cubre post_cubre "") 
+   
+    ;<-- Base Enchufe -->
+  (command "ucs" "y" 90 "")
+  (command "sphere" "0,0,102.5" diam_enchufe "")
+  (command "cylinder" "0,0,102.5" 2 3 "")
+  (setq base_enchu (ENTLAST))
   
     ;<-- Enchufe -->
-  (command "ucs" "y" 90 "")
-  (command "circle" "0,0,100.5" diam_enchufe "") ;base enchufe
-  (setq base_enchu (ENTLAST))
-
+  (command "cylinder" "0,1,105.5" 0.25 2 "") ;punto ancho largo
+  (setq conductor_1a (ENTLAST))
+  (command "sphere" "0,1,107.5" 0.25 "")
+  (setq conductor_1b (ENTLAST))
+  
+  (command "cylinder" "0,-1,105.5" 0.25 2 "") ;punto ancho largo
+  (setq conductor_2a (ENTLAST))
+  (command "sphere" "0,-1,107.5" 0.25 "")
+  (setq conductor_2b (ENTLAST))
+  
+  (command "union" conductor_1a conductor_1b conductor_2a conductor_2b  "")
+  (setq conductor_3 (ENTLAST))
+ 
+    ;<-- Union -->
+  (command "union" cable pre_cubre post_cubre base_echu enchu"") 
 (setvar "osmode" osmodo)
 )
