@@ -5,19 +5,18 @@
   (command "ucs" "w")
   
   ;<-- Variables -->
-  (setq punto_ini (list(0 0 0)))
+  (setq puntoin list(0 0 0))
   (setq diam_cubre "0.8")
   (setq dist_cubre "0.5")
   
   (setq diam_cable "0.5")
-  (setq dist_cable "100")
   
   (setq diam_enchufe "2")
   
   ;<-- Entrada de datos -->
   
     ;<-- Pre Cubre cable -->
-  (command "circle" "0,0" diam_cubre "") 
+  (command "circle" puntoin diam_cubre "") 
   (setq preancho_cubre (ENTLAST))
   
   (command "pline" "0,0" "0.5,0" "") 
@@ -36,7 +35,7 @@
   (command "sweep" ancho_cable "" largo_cable) ;crea el cable
   (setq cable (ENTLAST))
   
-  ;<-- Post Cubre cable -->
+    ;<-- Post Cubre cable -->
   (command "circle" "100,0" diam_cubre "") 
   (setq postancho_cubre (ENTLAST))
   
@@ -65,7 +64,7 @@
   
   (command "union" conductor_1a conductor_1b conductor_2a conductor_2b  "")
   (setq conductor_3 (ENTLAST))
- 
+   
     ;<-- Union -->
   (command "union" cable pre_cubre post_cubre base_echu enchu"") 
 (setvar "osmode" osmodo)
