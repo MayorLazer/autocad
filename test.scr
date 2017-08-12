@@ -5,10 +5,12 @@
   (command "ucs" "w")
   
   ;<-- Variables -->
+  (setq punto_ini (list(0 0 0)))
   (setq diam_cubre "0.8")
   (setq dist_cubre "0.5")
   
   (setq diam_cable "0.5")
+  (setq dist_cable "100")
   
   (setq diam_enchufe "2")
   
