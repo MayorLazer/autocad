@@ -4,16 +4,43 @@
   (command "layer" "s" "0" "")
   (command "ucs" "w")
   
-  ;;entrada de datos
-  (command "circle" "0,0" 0.5 "") ;;ancho del cable
-  (setq circu (ENTLAST))
+  ;<-- Variables -->
+  (setq diam_cubre "0.8")
+  (setq dist_cubre "0.5")
   
-  (command "pline" "0,0" "5,0" "") ;;largo del cable
-  (setq linea (ENTLAST))
+  (setq diam_cable "0.5")
   
-  (command "sweep" circu "" linea)
+  (setq diam_enchufe "2")
   
+  ;<-- Entrada de datos -->
+  
+    ;<-- Cubre cable -->
+  (command "circle" "0,0" diam_cubre "") ;ancho cubre
+  (setq ancho_cubre (ENTLAST))
+  
+  (command "pline" "0,0" "0.5,0" "") ;largo del cubre
+  (setq largo_cubre (ENTLAST))
+  
+  (command "sweep" ancho_cubre "" largo_cubre) ;crea el cubre
+  (setq cubre (ENTLAST))
+  
+    ;<-- Cable -->
+  (command "circle" "0,0" diam_cable "") ;ancho del cable
+  (setq ancho_cable (ENTLAST))
+  
+  (command "pline" "0,0" "5,0" "") ;largo del cable
+  (setq largo_cable (ENTLAST))
+  
+  (command "sweep" ancho_cable "" largo_cable) ;crea el cable
+  (setq cable (ENTLAST))
+  
+    ;<-- Union -->
+  (command "union" cable cubre "") 
+  
+    ;<-- Enchufe -->
   (command "ucs" "y" 90 "")
+  (command "circle" "5,0,0.5" diam_enchufe "") ;base enchufe
+  (setq base_enchu (ENTLAST))
 
 (setvar "osmode" osmodo)
 )
