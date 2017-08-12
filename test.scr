@@ -3,73 +3,67 @@
   (setvar "osmode" 0)
   (command "layer" "s" "0" "")
   (command "ucs" "w")
-  
+
   ;<-- Variables -->
-  (setq puntoin list(100 0 0))
-  (setq diam_cubre "0.8")
-  (setq dist_cubre "0.5")
-  
-  (setq diam_cable "0.5")
-  (setq dist_cable "100")
-  
-  (setq diam_enchufe "2")
-  
+  (setq puntoin (list 0 0 0))
+  (setq diam_cubre 0.8)
+  (setq dist_cubre 0.5)
+
+  (setq diam_cable 0.5)
+  (setq dist_cable 100)
+
+  (setq diam_enchufe 2)
+  (setq largo_encufe 3)
+
   ;<-- Entrada de datos -->
-  
+
     ;<-- Cubre cable -->
-  (command "circle" puntoin diam_cubre "") 
+  (command "circle" puntoin diam_cubre "")
   (setq ancho_cubre (ENTLAST))
-  
-  (setq punto2 puntoin list(+(cad diam_cubre))
-  (command "line" puntoin punto2 "") 
+
+  (setq punto2 (list (+ (car puntoin) diam_cubre)(cadr puntoin)(caddr puntoin)))
+  (command "line" puntoin punto2 "")
   (setq largo_cubre (ENTLAST))
-  
-  (command "sweep" preancho_cubre "" prelargo_cubre) ;crea el cubre
+
+  (command "sweep" ancho_cubre "" largo_cubre) ;crea el cubre
   (setq cubre (ENTLAST))
-  
+
     ;<-- Cable -->
-  (command "circle" "0,0" diam_cable "") 
+  (command "circle" puntoin diam_cable "")
   (setq ancho_cable (ENTLAST))
-  
-  (command "spline" "0,0" "10,0" "30,10" "60,-10" "90,10" "100,0" "" "0,0" "100,0") 
+
+  (command "spline" "0,0" "10,0" "30,10" "60,-10" "90,10" "100,0" "" "0,0" "100,0"); VER COMO HACER LA CURVA DE X LARGO
   (setq largo_cable (ENTLAST))
-  
+
   (command "sweep" ancho_cable "" largo_cable) ;crea el cable
   (setq cable (ENTLAST))
-  
-    ;<-- Post Cubre cable -->
-  ;(command "circle" "100,0" diam_cubre "") 
-  ;(setq postancho_cubre (ENTLAST))
-  
-  ;(command "pline" "100,0" "100.5,0" "") 
-  ;(setq postlargo_cubre (ENTLAST))
-  
-  ;(command "sweep" postancho_cubre "" postlargo_cubre) ;crea el cubre
-  ;(setq post_cubre (ENTLAST))
-   (setq punto2 list(+(car dist_cable))
-   (copy cubre "" puntoin punto2 ))
-   
+
+    <-- Post Cubre cable -->
+   (setq punto (list(+(car puntoin) dist_cable) (cadr puntoin) (caddr puntoin)))
+   (command "copy" cubre "" "d" punto "")
+
     ;<-- Base Enchufe -->
   (command "ucs" "y" 90 "")
-  (command "sphere" "0,0,102.5" diam_enchufe "")
-  (command "cylinder" "0,0,102.5" 2 3 "")
+  (setq punto (list (car puntoin) (cadr puntoin) (+(caddr puntoin) dist_cubre dist_cable)))
+  (command "sphere" punto diam_enchufe "")
+  (command "cylinder" punto diam_enchufe largo_enchufe "")
   (setq base_enchu (ENTLAST))
-  
+
     ;<-- Enchufe -->
   (command "cylinder" "0,1,105.5" 0.25 2 "") ;punto ancho largo
   (setq conductor_1a (ENTLAST))
   (command "sphere" "0,1,107.5" 0.25 "")
   (setq conductor_1b (ENTLAST))
-  
+
   (command "cylinder" "0,-1,105.5" 0.25 2 "") ;punto ancho largo
   (setq conductor_2a (ENTLAST))
   (command "sphere" "0,-1,107.5" 0.25 "")
   (setq conductor_2b (ENTLAST))
-  
+
   (command "union" conductor_1a conductor_1b conductor_2a conductor_2b  "")
   (setq conductor_3 (ENTLAST))
-   
+
     ;<-- Union -->
-  ;(command "union" cable pre_cubre post_cubre base_echu enchu "") 
+  ;(command "union" cable pre_cubre post_cubre base_echu enchu "")
 (setvar "osmode" osmodo)
 )
