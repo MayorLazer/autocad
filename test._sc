@@ -3,17 +3,13 @@
   (setvar "osmode" 0)
   (command "layer" "s" "0" "")
   (command "ucs" "w")
-  
   ;;entrada de datos
-  (command "circle" "0,0" 0.5 "") ;;ancho del cable
+  (setq puntoin (getpoint "Punto seleccionado: \n"))
+
+  (command "circle" "d" 0.5)
   (setq circu (ENTLAST))
   
-  (command "pline" "0,0" "5,0" "") ;;largo del cable
-  (setq linea (ENTLAST))
-  
-  (command "sweep" circu "" linea)
-  
-  (command "ucs" "y" 90 "")
+  (command "pline")
 
 (setvar "osmode" osmodo)
 )
