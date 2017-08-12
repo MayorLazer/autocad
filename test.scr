@@ -5,25 +5,27 @@
   (command "ucs" "w")
   
   ;<-- Variables -->
-  (setq puntoin list(0 0 0))
+  (setq puntoin list(100 0 0))
   (setq diam_cubre "0.8")
   (setq dist_cubre "0.5")
   
   (setq diam_cable "0.5")
+  (setq dist_cable "100")
   
   (setq diam_enchufe "2")
   
   ;<-- Entrada de datos -->
   
-    ;<-- Pre Cubre cable -->
+    ;<-- Cubre cable -->
   (command "circle" puntoin diam_cubre "") 
-  (setq preancho_cubre (ENTLAST))
+  (setq ancho_cubre (ENTLAST))
   
-  (command "pline" "0,0" "0.5,0" "") 
-  (setq prelargo_cubre (ENTLAST))
+  (setq punto2 puntoin list(+(cad diam_cubre))
+  (command "line" puntoin punto2 "") 
+  (setq largo_cubre (ENTLAST))
   
   (command "sweep" preancho_cubre "" prelargo_cubre) ;crea el cubre
-  (setq pre_cubre (ENTLAST))
+  (setq cubre (ENTLAST))
   
     ;<-- Cable -->
   (command "circle" "0,0" diam_cable "") 
@@ -36,14 +38,16 @@
   (setq cable (ENTLAST))
   
     ;<-- Post Cubre cable -->
-  (command "circle" "100,0" diam_cubre "") 
-  (setq postancho_cubre (ENTLAST))
+  ;(command "circle" "100,0" diam_cubre "") 
+  ;(setq postancho_cubre (ENTLAST))
   
-  (command "pline" "100,0" "100.5,0" "") 
-  (setq postlargo_cubre (ENTLAST))
+  ;(command "pline" "100,0" "100.5,0" "") 
+  ;(setq postlargo_cubre (ENTLAST))
   
-  (command "sweep" postancho_cubre "" postlargo_cubre) ;crea el cubre
-  (setq post_cubre (ENTLAST))
+  ;(command "sweep" postancho_cubre "" postlargo_cubre) ;crea el cubre
+  ;(setq post_cubre (ENTLAST))
+   (setq punto2 list(+(car dist_cable))
+   (copy cubre "" puntoin punto2 ))
    
     ;<-- Base Enchufe -->
   (command "ucs" "y" 90 "")
@@ -66,6 +70,6 @@
   (setq conductor_3 (ENTLAST))
    
     ;<-- Union -->
-  (command "union" cable pre_cubre post_cubre base_echu enchu"") 
+  ;(command "union" cable pre_cubre post_cubre base_echu enchu "") 
 (setvar "osmode" osmodo)
 )
