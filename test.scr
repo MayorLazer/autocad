@@ -7,44 +7,45 @@
   ;<-- Variables -->
   (setq puntoin (list 0 0 0))
   (setq diam_cubre 0.8)
-  (setq dist_cubre 0.5)
+  (setq largo_cubre 0.5)
 
   (setq diam_cable 0.5)
-  (setq dist_cable 100)
+  (setq largo_cable 100)
 
   (setq diam_enchufe 2)
-  (setq largo_encufe 3)
+  (setq largo_enchufe 3)
 
   ;<-- Entrada de datos -->
 
     ;<-- Cubre cable -->
   (command "circle" puntoin diam_cubre "")
-  (setq ancho_cubre (ENTLAST))
+  (setq contorno_cubre (ENTLAST))
 
-  (setq punto2 (list (+ (car puntoin) diam_cubre)(cadr puntoin)(caddr puntoin)))
+  (setq punto2 (list (+ (car puntoin) largo_cubre) (cadr puntoin) (caddr puntoin)))
   (command "line" puntoin punto2 "")
-  (setq largo_cubre (ENTLAST))
+  (setq linea_cubre (ENTLAST))
 
-  (command "sweep" ancho_cubre "" largo_cubre) ;crea el cubre
+  (command "sweep" contorno_cubre "" linea_cubre) ;crea el cubre
   (setq cubre (ENTLAST))
 
     ;<-- Cable -->
   (command "circle" puntoin diam_cable "")
-  (setq ancho_cable (ENTLAST))
+  (setq contorno_cable (ENTLAST))
 
   (command "spline" "0,0" "10,0" "30,10" "60,-10" "90,10" "100,0" "" "0,0" "100,0"); VER COMO HACER LA CURVA DE X LARGO
-  (setq largo_cable (ENTLAST))
+  (setq linea_cable (ENTLAST))
 
-  (command "sweep" ancho_cable "" largo_cable) ;crea el cable
+  (command "sweep" contorno_cable "" linea_cable) ;crea el cable
   (setq cable (ENTLAST))
 
     <-- Post Cubre cable -->
-   (setq punto (list(+(car puntoin) dist_cable) (cadr puntoin) (caddr puntoin)))
-   (command "copy" cubre "" "d" punto "")
+  (setq punto (list (+ (car puntoin) largo_cable) (cadr puntoin) (caddr puntoin)))
+  (command "copy" cubre "" "d" punto "")
+  (setq cubre2 (ENTLAST))
 
     ;<-- Base Enchufe -->
   (command "ucs" "y" 90 "")
-  (setq punto (list (car puntoin) (cadr puntoin) (+(caddr puntoin) dist_cubre dist_cable)))
+  (setq punto (list (car puntoin) (cadr puntoin) (+(caddr puntoin) largo_cubre largo_cable diam_enchufe)))
   (command "sphere" punto diam_enchufe "")
   (command "cylinder" punto diam_enchufe largo_enchufe "")
   (setq base_enchu (ENTLAST))
@@ -64,6 +65,6 @@
   (setq conductor_3 (ENTLAST))
 
     ;<-- Union -->
-  ;(command "union" cable pre_cubre post_cubre base_echu enchu "")
+  (command "union" cable cubre cubre2 "")
 (setvar "osmode" osmodo)
 )
