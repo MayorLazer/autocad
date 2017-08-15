@@ -15,7 +15,10 @@
   (setq diam_enchufe 2)
   (setq largo_enchufe 3)
 
-  ;<-- Entrada de datos -->
+  (setq diam_conductor 0.25)
+  (setq largo_conductor 2)
+
+    ;<-- Entrada de datos -->
 
     ;<-- Cubre cable -->
   (command "circle" puntoin diam_cubre "")
@@ -38,33 +41,50 @@
   (command "sweep" contorno_cable "" linea_cable) ;crea el cable
   (setq cable (ENTLAST))
 
-    <-- Post Cubre cable -->
+    ;<-- Post Cubre cable -->
   (setq punto (list (+ (car puntoin) largo_cable) (cadr puntoin) (caddr puntoin)))
   (command "copy" cubre "" "d" punto "")
   (setq cubre2 (ENTLAST))
 
-    ;<-- Base Enchufe -->
+    ;<-- Union de cable y cubres -->
+  (command "union" cable cubre cubre2 "")
+
+    ;<-- Enchufe Base -->
   (command "ucs" "y" 90 "")
-  (setq punto (list (car puntoin) (cadr puntoin) (+(caddr puntoin) largo_cubre largo_cable diam_enchufe)))
+  (setq punto (list (car puntoin) (cadr puntoin) (+(caddr puntoin) largo_cable largo_cubre diam_enchufe)))
   (command "sphere" punto diam_enchufe "")
   (command "cylinder" punto diam_enchufe largo_enchufe "")
-  (setq base_enchu (ENTLAST))
+  (setq base_enchufe (ENTLAST))
 
-    ;<-- Enchufe -->
-  (command "cylinder" "0,1,105.5" 0.25 2 "") ;punto ancho largo
+    ;<-- Enchufe Conductor -->
+  (setq punto (list (car punto) (+ (cadr punto) (/ diam_enchufe 2)) (+ (caddr punto) largo_enchufe) ))
+  (command "cylinder" punto diam_conductor largo_conductor "")
   (setq conductor_1a (ENTLAST))
-  (command "sphere" "0,1,107.5" 0.25 "")
+
+  (setq punto2 (list (car punto) (cadr punto) (+ (caddr punto) largo_conductor) ))
+  (command "sphere" punto2 diam_conductor "")
   (setq conductor_1b (ENTLAST))
 
-  (command "cylinder" "0,-1,105.5" 0.25 2 "") ;punto ancho largo
-  (setq conductor_2a (ENTLAST))
-  (command "sphere" "0,-1,107.5" 0.25 "")
-  (setq conductor_2b (ENTLAST))
+  (command "union" conductor_1a conductor_1b "")
+  (setq conductor (ENTLAST))
 
-  (command "union" conductor_1a conductor_1b conductor_2a conductor_2b  "")
-  (setq conductor_3 (ENTLAST))
+  (setq mirror_punto (list (+ (car puntoin) diam_enchufe) (cadr puntoin) (caddr puntoin)))
+  (command "line" puntoin mirror_punto "")
+  (setq mirror_line (ENTLAST))
+
+  (command "mirror" conductor "" punto2 40 180 "n" ) ;NO ANDA EL MIRROR en el "segundo punto algo de lo copalanar"
+  (setq conductor2 (ENTLAST))
+
+
+  ;(command "cylinder" "0,-1,105.5" diam_conductor largo_conductor "") ;punto ancho largo
+  ;(setq conductor_2a (ENTLAST))
+  ;(command "sphere" "0,-1,107.5" diam_conductor "")
+  ;(setq conductor_2b (ENTLAST))
+
+  ;(command "union" conductor_1a conductor_1b conductor_2a conductor_2b  "")
+  ;(setq conductor_3 (ENTLAST))
 
     ;<-- Union -->
-  (command "union" cable cubre cubre2 "")
+    (command "union" base_enchufe "")
 (setvar "osmode" osmodo)
 )
