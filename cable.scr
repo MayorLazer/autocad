@@ -7,82 +7,124 @@
   ;<-- Variables -->
   (setq puntoin (list 0 0 0))
 
-  (setq diam_cubre 0.8)
-  (setq largo_cubre 0.5)
+  (setq cubre_diam 0.8)
+  (setq cubre_largo 0.5)
 
-  (setq diam_cable 0.5)
-  (setq largo_cable 100)
+  (setq cable_diam 0.5)
+  (setq cable_largo 100)
 
-  (setq diam_enchufe 2)
-  (setq largo_enchufe 3)
+  (setq enchufe_diam 2)
+  (setq enchufe_largo 3)
 
-  (setq diam_conductor 0.25)
-  (setq largo_conductor 2)
+  (setq conector_diam 0.25)
+  (setq conector_largo 2)
+  (setq conector_x 0.5)
+  (setq conector_y 0.1)
 
     ;<-- Entrada de datos -->
 
-    ;<-- Cubre cable -->
-  (command "circle" puntoin diam_cubre "")
-    (setq contorno_cubre (ENTLAST))
-
-  (setq punto2 (list (+ (car puntoin) largo_cubre) (cadr puntoin) (caddr puntoin)))
-  (command "line" puntoin punto2 "")
-    (setq linea_cubre (ENTLAST))
-
-  (command "sweep" contorno_cubre "" linea_cubre) ;crea el cubre
-    (setq cubre (ENTLAST))
-
     ;<-- Cable -->
-  (command "circle" puntoin diam_cable "")
-    (setq contorno_cable (ENTLAST))
+  (defun cable ( cubre_diam, cubre_largo, cable_diam, cable_largo)
+     ;<-- Cubre cable -->
+    (command "circle" puntoin cubre_diam "")
+      (setq contorno_cubre (ENTLAST))
 
-  (command "spline" "0,0" "10,0" "30,10" "60,-10" "90,10" "100,0" "" "0,0" "100,0"); VER COMO HACER LA CURVA DE X LARGO
-    (setq linea_cable (ENTLAST))
+    (setq puntoaux (list (+ (car puntoin) cubre_largo) (cadr puntoin) (caddr puntoin)))
+    (command "line" puntoin puntoaux "")
+      (setq linea_cubre (ENTLAST))
 
-  (command "sweep" contorno_cable "" linea_cable) ;crea el cable
+    (command "sweep" contorno_cubre "" linea_cubre) ;crea el cubre
+      (setq cubre (ENTLAST))
+
+      ;<-- Cable -->
+    (command "circle" puntoin cable_diam "")
+      (setq contorno_cable (ENTLAST))
+
+    (command "spline" "0.5,0" "10,0" "30,10" "60,-10" "90,10" "100,0" "" "0,0" "100,0"); hacer que arranque en puntoin + cubreVER COMO HACER LA CURVA DE X LARGO
+      (setq linea_cable (ENTLAST))
+
+    (command "sweep" contorno_cable "" linea_cable) ;crea el cable
+      (setq cable (ENTLAST))
+
+      ;<-- Post Cubre Cable -->
+    (setq puntoaux (list (+ (car puntoaux) cable_largo) (cadr puntoin) (caddr puntoin)))
+    (command "copy" cubre "" "d" puntoaux "") ;crea la copia del cubre del otro extremo
+      (setq cubre2 (ENTLAST))
+
+      ;<-- Union del Cable y Cubres -->
+    (command "union" cable cubre cubre2 "")
     (setq cable (ENTLAST))
-
-    ;<-- Post Cubre Cable -->
-  (setq punto (list (+ (car puntoin) largo_cable) (cadr puntoin) (caddr puntoin)))
-  (command "copy" cubre "" "d" punto "") ;crea la copia del cubre del otro extremo
-    (setq cubre2 (ENTLAST))
-
-    ;<-- Union del Cable y Cubres -->
-  (command "union" cable cubre cubre2 "")
-
+  )
     ;<-- Enchufe Base -->
-  (command "ucs" "y" 90 "")
+  (defun enchufe ()
 
-  (setq punto (list (car puntoin) (cadr puntoin) (+(caddr puntoin) largo_cable largo_cubre diam_enchufe)))
-  (command "sphere" punto diam_enchufe "")
-    (setq base_enchufe1 (ENTLAST))
-  (command "cylinder" punto diam_enchufe largo_enchufe "")
-    (setq base_enchufe2 (ENTLAST))
+    (command "ucs" "y" 90 "")
 
-  (command "union" base_enchufe1 base_enchufe2 "") ;crea Enchufe Base
-    (setq base_enchufe (ENTLAST))
+    (setq puntoaux (list (car puntoin) (cadr puntoin) (+(caddr puntoin) cubre_largo cable_largo cubre_largo enchufe_diam)))
+    (command "sphere" puntoaux enchufe_diam "")
+      (setq base_enchufe1 (ENTLAST))
+    (command "cylinder" puntoaux enchufe_diam enchufe_largo "")
+      (setq base_enchufe2 (ENTLAST))
 
-    ;<-- Enchufe Conductor -->
-  (setq punto (list (car punto) (+ (cadr punto) (/ diam_enchufe 2)) (+ (caddr punto) largo_enchufe) ))
-  (command "cylinder" punto diam_conductor largo_conductor "")
-    (setq conductor_1a (ENTLAST))
+    (command "union" base_enchufe1 base_enchufe2 "") ;crea Enchufe Base
+      (setq base_enchufe (ENTLAST))
 
-  (setq punto2 (list (car punto) (cadr punto) (+ (caddr punto) largo_conductor) ))
-  (command "sphere" punto2 diam_conductor "")
-    (setq conductor_1b (ENTLAST))
+      ;<-- Enchufe conector -->
 
-  (command "union" conductor_1a conductor_1b "") ;crea Conductor
-    (setq conductor (ENTLAST))
+          ;<-- Conector 2 patitas redondas -->
+          (defun conector_redondo (enchufe_diam, enchufe_largo, conector_diam, conector_largo)
+            (setq puntoaux (list (car puntoaux) (+ (cadr puntoaux) (/ enchufe_diam 2)) (+ (caddr puntoaux) enchufe_largo) ))
+            (command "cylinder" puntoaux conector_diam conector_largo "")
+              (setq conector_1a (ENTLAST))
 
-  (setq mirror_punto  (list (car puntoin) (cadr puntoin) ))
-  (setq mirror_punto2 (list (+ (car puntoin) diam_enchufe) (cadr puntoin) ))
+            (setq punto2 (list (car puntoaux) (cadr puntoaux) (+ (caddr puntoaux) conector_largo) ))
+            (command "sphere" punto2 conector_diam "")
+              (setq conector_1b (ENTLAST))
 
-  (command "mirror" conductor "" mirror_punto mirror_punto2 "n" "" ) ;NO ANDA EL MIRROR en el "segundo punto algo de lo copalanar"
-    (setq conductor2 (ENTLAST))
+            (command "union" conector_1a conector_1b "") ;crea conector
+              (setq conector (ENTLAST))
 
-    ;<-- Union de Base Enchufe y Conductor -->
-  (command "union" base_enchufe conductor "")
+            (setq mirror_punto  (list (car puntoin) (cadr puntoin) ))
+            (setq mirror_punto2 (list (+ (car puntoin) enchufe_diam) (cadr puntoin) ))
 
-    ;<-- Union -->
+            (command "mirror" conector "" mirror_punto mirror_punto2 "n" "" )
+              (setq conector2 (ENTLAST))
+
+            (command "union" conector conector2 "") ;unifica conector
+              (setq conector (ENTLAST))
+          )
+
+          ;<-- Conector 2 patitas rectas  -->
+          (defun conector_recto ()
+            (setq puntoaux_a (list (+ (car puntoaux) conector_x ) (+ (cadr puntoaux) (/ enchufe_diam 2) conector_y) (+ (caddr puntoaux) enchufe_largo) ))
+            (setq puntoaux_b (list (- (car puntoaux) conector_x ) (+ (cadr puntoaux) (/ enchufe_diam 2))             (+ (caddr puntoaux) enchufe_largo) ))
+
+            (command "box" puntoaux_a puntoaux_b conector_largo "") ;Crea conector
+              (setq conector (ENTLAST))
+
+            ;Intento fallido de hacer huequito en el conector (command "ucs" "w" "")
+            ;Intento fallido de hacer huequito en el conector (command "ucs" "x" -90 "")
+            ;Intento fallido de hacer huequito en el conector (setq puntoaux1 (list (+ caddr puntoaux (- enchufe_largo 1 )) 0 0))
+            ;Intento fallido de hacer huequito en el conector (command "cylinder" puntoaux1 200 100 "" )
+            ;Intento fallido de hacer huequito en el conector   (setq hueco (ENTLAST))
+            ;Intento fallido de hacer huequito en el conector (command "ucs" "w" "")
+            ;Intento fallido de hacer huequito en el conector (command "ucs" "y" 90 "")
+
+            ;Intento fallido de hacer huequito en el conector (command "substract" conector "" hueco ) ;Crea el huequito
+
+            (setq mirror_punto  (list (car puntoin) (cadr puntoin) ))
+            (setq mirror_punto2 (list (+ (car puntoin) enchufe_diam) (cadr puntoin) ))
+
+            (command "mirror" conector "" mirror_punto mirror_punto2 "n" "" ) ;Crea el mirror del conector
+              (setq conector2 (ENTLAST))
+
+            (command "union" conector conector2 "")
+              (setq conector (ENTLAST)) ; unifica los conectores
+          )
+  )
+    ;<-- Union de Base Enchufe Conector Cable -->
+  (command "union"  cable base_enchufe conector"") ; unifica base con los conectores ya unificados
+
+    ;<-- Devuelve variables de usario -->
 (setvar "osmode" osmodo)
 )
