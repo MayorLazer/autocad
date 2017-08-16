@@ -40,15 +40,16 @@
     (command "circle" puntoin cable_diam "")
       (setq contorno_cable (ENTLAST))
 
-    (command "spline" "0.5, 0" "10, 0" "30, 10" "60, -10" "90, 10" "100, 0" "" "0, 0" "100, 0"); hacer que arranque en puntoin + cubreVER COMO HACER LA CURVA DE X LARGO
+    (setq puntoaux (list (+ (car puntoaux) cable_largo) (cadr puntoin) (caddr puntoin)))
+    (command "line" puntoin puntoaux "")
+    ;(command "spline" "0.5, 0" "10, 0" "30, 10" "60, -10" "90, 10" "100, 0" "" "0, 0" "100, 0"); hacer que arranque en puntoin + cubreVER COMO HACER LA CURVA DE X LARGO
       (setq linea_cable (ENTLAST))
 
     (command "sweep" contorno_cable "" linea_cable) ;crea el cable
       (setq cable (ENTLAST))
 
       ;<-- Post Cubre Cable -->
-    (setq puntoaux (list (+ (car puntoaux) cable_largo) (cadr puntoin) (caddr puntoin)))
-    (command "copy" cubre "" "d" puntoaux "") ;crea la copia del cubre del otro extremo
+      (command "copy" cubre "" "d" puntoaux "") ;crea la copia del cubre del otro extremo
       (setq cubre2 (ENTLAST))
 
       ;<-- Union del Cable y Cubres -->
@@ -85,7 +86,7 @@
             (setq mirror_punto  (list (car puntoin) (cadr puntoin) ))
             (setq mirror_punto2 (list (+ (car puntoin) enchufe_diam) (cadr puntoin) ))
 
-            (command "mirror" conector "" mirror_punto mirror_punto2 "n" "" )
+            (command "mirror" conector_mitad "" mirror_punto mirror_punto2 "n" "" )
               (setq conector_mitad2 (ENTLAST))
 
             (command "union" conector_mitad conector_mitad2 "") ;unifica conector
@@ -142,8 +143,9 @@
 
             (setq punto3 (list 0 (- (/ enchufe_diam 2)) 0 ))
             (command "copy" conector_mitad "" "d" punto3 "" )
+              (setq conector_mitad3 (ENTLAST))
 
-            (command "union" conector_mitad conector_mitad2 "") ;unifica conector
+            (command "union" conector_mitad conector_mitad2 conector_mitad3 "") ;unifica conector
               (setq conector (ENTLAST))
           )
       ;<-- Enchufe conector -->
