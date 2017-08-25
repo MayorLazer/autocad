@@ -1,0 +1,86 @@
+(defun c:main2 ()
+  (setq osmodo (getvar "osmode"))
+  (setvar "osmode" 0)
+  (command "layer" "s" "0" "")
+  (command "ucs" "w")
+
+  ;<-- Variables -->
+  (setq puntoin (list 0 0 0))
+
+  (setq ang_tapita 15)
+  (setq tapita_radio 1.5)
+  (setq tapita_largo 1)
+
+  (setq arandela_radio 0.8)
+  (setq arandela_largo   0.8)
+
+  (setq fusible_radio 0.5)
+  (setq fusible_largo 1)
+
+  ;<-- Definicion de funciones  -->
+
+  ;<-- Fusible -->
+  (defun fusible ( )
+
+      ;<-- Perforacion -->
+    (command "cylinder" puntoin tapita_radio 3 "")
+      (setq Perforacion_mayor (ENTLAST))
+    (command "cylinder" puntoin arandela_radio 3 "")
+      (setq Perforacion_menor (ENTLAST))
+    (command "subtract" Perforacion_mayor "" Perforacion_menor "")
+      (setq perforacion (ENTLAST))
+      ;<-- Helice Interna -->
+    (command "helix" puntoin arandela_radio arandela_radio "t" 5 2.9)
+      (setq base_helix (ENTLAST))
+    (command "circle" puntoin 0.08 "")
+      (setq circulo_arandela (ENTLAST))
+    (command "sweep" circulo_arandela "" base_helix "")
+      (setq arandela (ENTLAST))
+    (command "union" arandela perforacion "")
+      (setq perforacion (ENTLAST))
+
+      ;<-- Fusible -->
+    (setq punto_aux (list (car puntoin) (cadr puntoin) ( + (caddr puntoin) 3 2 ))) ;Para que se vea táctico separado serparo en 2 cm
+    (command "cylinder" punto_aux fusible_radio fusible_radio )
+      (setq metal_fusible (ENTLAST))
+    (setq punto_aux (list (car puntoin) (cadr puntoin) ( + (caddr punto_aux) fusible_radio )))
+    (command "cylinder" punto_aux (- fusible_radio 0.1) fusible_largo )
+      (setq vidrio_fusible (ENTLAST))
+    (setq punto_aux (list (car puntoin) (cadr puntoin) ( + (caddr punto_aux) fusible_largo )))
+    (command "cylinder" punto_aux fusible_radio fusible_radio )
+      (setq metal_fusible2 (ENTLAST))
+    (command "union" metal_fusible vidrio_fusible metal_fusible2 "")
+      (setq fusible (ENTLAST))
+
+      ;<-- Arandela --> EDITAR DESDE ACA LOS PUNTOS PARA LA CONTUSCCION
+    (setq punto_aux (list (car puntoin) (cadr puntoin) ( + (caddr punto_aux) fusible_radio 2 ))); Para que se vea táctico serparo en 2 cm
+    (command "cylinder" punto_aux arandela_radio arandela_largo "")
+      (setq base_arandela (ENTLAST))
+
+    (command "helix" punto_aux arandela_radio arandela_radio "t" 2.9 arandela_largo)
+      (setq helix (ENTLAST))
+    (command "circle" puntoin 0.08 "")
+      (setq circulo_arandela (ENTLAST))
+    (command "sweep" circulo_arandela "" helix "")
+      (setq helice (ENTLAST))
+    (command "union" base_arandela helice "")
+      (setq arandela (ENTLAST))
+
+      ;<-- Tapita -->
+    (setq punto_aux (list (car puntoin) (cadr puntoin) ( + (caddr punto_aux) arandela_largo)))
+    (command "circle" punto_aux tapita_radio "")
+      (setq circulo_tapita (ENTLAST))
+    (command "extrude" circulo_tapita "" "t" ang_tapita tapita_largo "")
+      (setq tapita (ENTLAST))
+
+      ;<-- Texto -->
+    (setq punto_text (list (car puntoin) (- (cadr puntoin)  (/ tapita_radio 2) ) ( + (caddr punto_aux) tapita_largo )))
+    (command "text" punto_text 0.5 90  "FUSE")
+
+      ;<-- Union -->
+    (command "union" perforacion fusible arandela tapita "")
+
+  )
+
+  (fusible)
+)
