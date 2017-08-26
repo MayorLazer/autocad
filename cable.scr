@@ -6,6 +6,7 @@
 
   ;<-- Variables -->
   (setq puntoin (list 0 0 0))
+  (setq puntoaux(list 0 0 0))
 
   (setq cubre_radio 0.8)
   (setq cubre_largo 1.5)
@@ -25,32 +26,21 @@
 
     ;<-- Cable -->
   (defun cable ( )
+
+    (command "ucs" "y" 90)
      ;<-- Cubre cable -->
-    (command "circle" puntoin cubre_radio "")
-      (setq contorno_cubre (ENTLAST))
-
-    (setq puntoaux (list (+ (car puntoin) cubre_largo) (cadr puntoin) (caddr puntoin)))
-    (command "line" puntoin puntoaux "")
-      (setq linea_cubre (ENTLAST))
-
-    (command "sweep" contorno_cubre "" linea_cubre) ;crea el cubre
+    (command "cylinder" puntoin cubre_radio cubre_largo)
       (setq cubre (ENTLAST))
 
       ;<-- Cable -->
-    (command "circle" puntoin cable_radio "")
-      (setq contorno_cable (ENTLAST))
-
-    (setq puntoaux (list (+ (car puntoaux) cable_largo) (cadr puntoin) (caddr puntoin)))
-    (command "line" puntoin puntoaux "")
-    ;(command "spline" "0.5, 0" "10, 0" "30, 10" "60, -10" "90, 10" "100, 0" "" "0, 0" "100, 0"); hacer que arranque en puntoin + cubreVER COMO HACER LA CURVA DE X LARGO
-      (setq linea_cable (ENTLAST))
-
-    (command "sweep" contorno_cable "" linea_cable) ;crea el cable
+    (setq puntoaux (list (car puntoaux) (cadr puntoin) (+ (caddr puntoin) cubre_largo) ))
+    (command "cylinder" puntoaux cable_radio cable_largo)
       (setq cable (ENTLAST))
 
       ;<-- Post Cubre Cable -->
-      (command "copy" cubre "" "d" puntoaux "") ;crea la copia del cubre del otro extremo
-      (setq cubre2 (ENTLAST))
+    (setq puntoaux (list (car puntoaux) (cadr puntoin) (+ (caddr puntoin) cable_largo cubre_largo )))
+    (command "copy" cubre "" "d" puntoaux) ;crea la copia del cubre del otro extremo
+    (setq cubre2 (ENTLAST))
 
       ;<-- Union del Cable y Cubres -->
     (command "union" cable cubre cubre2 "")
@@ -59,25 +49,23 @@
     ;<-- Enchufe Base -->
   (defun enchufe ()
 
-    (command "ucs" "y" 90 "")
-
     (setq puntoaux (list (car puntoin) (cadr puntoin) (+ (caddr puntoin) cubre_largo cable_largo cubre_largo enchufe_radio)))
-    (command "sphere" puntoaux enchufe_radio "")
+    (command "sphere" puntoaux enchufe_radio)
       (setq base_enchufe1 (ENTLAST))
-    (command "cylinder" puntoaux enchufe_radio enchufe_largo "")
+    (command "cylinder" puntoaux enchufe_radio enchufe_largo)
       (setq base_enchufe2 (ENTLAST))
-
+      ;<-- Union base enchufe -->
     (command "union" base_enchufe1 base_enchufe2 "") ;crea Enchufe Base
       (setq base_enchufe (ENTLAST))
 
           ;<-- Conector 2 patitas redondas -->
           (defun conector_circular ()
             (setq puntoaux (list (car puntoaux) (+ (cadr puntoaux) (/ enchufe_radio 2)) (+ (caddr puntoaux) enchufe_largo) ))
-            (command "cylinder" puntoaux conector_radio conector_largo "")
+            (command "cylinder" puntoaux conector_radio conector_largo)
               (setq conector_1a (ENTLAST))
 
             (setq punto2 (list (car puntoaux) (cadr puntoaux) (+ (caddr puntoaux) conector_largo) ))
-            (command "sphere" punto2 conector_radio "")
+            (command "sphere" punto2 conector_radio)
               (setq conector_1b (ENTLAST))
 
             (command "union" conector_1a conector_1b "") ;crea conector
@@ -97,7 +85,7 @@
             (setq puntoaux_a (list (+ (car puntoaux) conector_x ) (+ (cadr puntoaux) (/ enchufe_radio 2) conector_y) (+ (caddr puntoaux) enchufe_largo) ))
             (setq puntoaux_b (list (- (car puntoaux) conector_x ) (+ (cadr puntoaux) (/ enchufe_radio 2))             (+ (caddr puntoaux) enchufe_largo) ))
 
-            (command "box" puntoaux_a puntoaux_b conector_largo "") ;Crea conector
+            (command "box" puntoaux_a puntoaux_b conector_largo) ;Crea conector
               (setq conector (ENTLAST))
 
             ;Intento fallido de hacer huequito en el conector (command "ucs" "w" "")
@@ -125,11 +113,11 @@
           ;<-- Conector 3 patitas redondas (Brasilero) -->
           (defun conector_brasilero ()
             (setq puntoaux (list (car puntoaux) (+ (cadr puntoaux) (/ enchufe_radio 2)) (+ (caddr puntoaux) enchufe_largo) ))
-            (command "cylinder" puntoaux conector_radio conector_largo "")
+            (command "cylinder" puntoaux conector_radio conector_largo)
               (setq conector_1a (ENTLAST))
 
             (setq punto2 (list (car puntoaux) (cadr puntoaux) (+ (caddr puntoaux) conector_largo) ))
-            (command "sphere" punto2 conector_radio "")
+            (command "sphere" punto2 conector_radio)
               (setq conector_1b (ENTLAST))
 
             (command "union" conector_1a conector_1b "") ;crea conector
@@ -153,7 +141,7 @@
       (setq opF (getstring "Circular-> C | Recto-> R | Diagonal-> D | Brasilero-> B :\n"))
       (cond
         ((= opF "C") (conector_circular))
-        ((= opF "R") (conector_recto)); Ver como se hace 2 lineas post if
+        ((= opF "R") (conector_recto))
         ((= opF "D") (conector_diagonal))
         ((= opF "B") (conector_brasilero))
       )

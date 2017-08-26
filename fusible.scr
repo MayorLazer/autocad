@@ -24,9 +24,9 @@
   (defun fusible ( )
 
       ;<-- Perforacion -->
-    (command "cylinder" puntoin tapita_radio 3 "")
+    (command "cylinder" puntoin tapita_radio 3 )
       (setq Perforacion_mayor (ENTLAST))
-    (command "cylinder" puntoin arandela_radio 3 "")
+    (command "cylinder" puntoin arandela_radio 3 )
       (setq Perforacion_menor (ENTLAST))
     (command "subtract" Perforacion_mayor "" Perforacion_menor "")
       (setq perforacion (ENTLAST))
@@ -56,7 +56,7 @@
 
       ;<-- Arandela -->
     (setq punto_aux (list (car puntoin) (cadr puntoin) ( + (caddr punto_aux) fusible_radio espacio_tactico ))); Para que se vea táctico serparo en 2 cm
-    (command "cylinder" punto_aux arandela_radio arandela_largo "")
+    (command "cylinder" punto_aux arandela_radio arandela_largo )
       (setq base_arandela (ENTLAST))
 
     (setq a 0)
@@ -69,7 +69,7 @@
 
       ;<-- Tapita -->
     (setq punto_aux (list (car puntoin) (cadr puntoin) (caddr punto_aux) ))
-    (command "circle" punto_aux tapita_radio "")
+    (command "circle" punto_aux tapita_radio )
       (setq circulo_tapita (ENTLAST))
     (command "extrude" circulo_tapita "" "t" ang_tapita tapita_largo "")
       (setq tapita (ENTLAST))
