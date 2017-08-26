@@ -1,0 +1,190 @@
+(defun C:ba()
+
+(setq snp(getvar "osmode"))
+(setvar "osmode" 0)
+(command "ucs" "w")
+(command "erase" "all" "")
+(command "vpoint" "1,-1,1")
+
+(setq ptoinsercion(getpoint "ingrese punto insercion:"))(terpri)
+(setq cantenchufe(getint "ingrese la cantidad de enchufes deseada:"))(terpri)
+
+
+
+;;;//////////////////////////////////////////////////////////////////////////////////////////// INTERRUPTOR LU
+  (setq snp (getvar "osmode"))
+  (setvar "osmode" 0)
+  (command "ucs" "w" "")
+  
+  (setq punto (list 0 0 0)) 
+  (setq p1 (list 3.08 2.18 0))
+  (command "rectangle" punto p1 "")
+  (setq ent1 (entlast))
+  (command "fillet" "r" "0.2" "")
+  (command "fillet" "p" ent1 "" "")
+  (setq ent2 (entlast))
+  (command "extrude" ent2 "" "1.6" "" "")
+
+  (setq p1 (list (- (nth 0 punto) 0.185) (- (nth 1 punto) 0.185) (+ 1.6 (nth 2 punto)) ))
+  (setq p2 (list (+ (nth 0 p1) 3.45) (+ (nth 1 p1) 2.55) (nth 2 p1)) )
+  (command "rectangle" p1 p2 "")
+  (setq ent3 (entlast))
+
+  (command "fillet" "p" ent3 "" "")
+  (setq ent4 (entlast))
+  (command "extrude" ent4 "" "0.2" "" "")
+  (setq ent5 (entlast))
+
+  (setq p2 (list 1.54 -1.8 0.15))
+  (command "ucs" "n" "x" "-90" "")
+  (command "cylinder" p2 "1.54" "1.88" "")
+  (setq ent6 (entlast))
+  (setq p3 (list (+ 1.54 (nth 0 p2) ) (- (nth 1 p2)  4) (nth 2 p2)))
+  (command "cylinder" p3 "4.0" "1.88" "")
+  (setq ent7 (entlast))
+  (command "subtract" ent6 "" ent7 "")
+  (command "ucs" "n" "y" "90" "")
+
+  (setq p1 (list -1.555 -0.3 0.72))
+  (setq p2 (list -0.630 1.0 0.72))
+  (command "rectangle" p1 p2 "")
+  (setq ent8 (entlast))
+
+  (command "fillet" "r" "0.25" "")
+  (command "fillet" "p" ent8 "" "")
+  (setq ent9 (entlast))
+
+  (command "extrude" ent9 "" "0.1" "" "")
+  (setq ent10 (entlast))
+  (setq p1 (list -1.09 0.6 0.67))
+
+  (command "cylinder" p1 "0.2" "0.5" "")
+  (setq ent11(entlast))
+  (command "subtract" ent10 "" ent11 "")
+  (setq ent12(entlast))
+  
+  (command "ucs" "w" "")
+  (setq p2 (list  1.54 0 0))
+  (setq p3 (list 1.54 1.09 0))
+  (setq ent13 (entlast))
+  (command "mirror" ent13 "" p2 p3 "n" "")
+  (setq ent14 (entlast))
+  (command "ucs" "w" "")
+  (command "union" "all" "")
+  (setq entidadboton (entlast))
+ 
+;;;//////////////////////////////////////////////////////////////////////////////////////////////// ZAPATILLA BELU
+  
+
+;;;eje en x / eje y de la zapatilla vendria a ser
+;;;1 es la distancia entre conectores x
+;;;2 es la distancia entre conectores y de arriba y abajo
+;;;prof1 es la tapa superior
+;;;prof2 es la tapa inferior
+;;;profundo es el profundo total de la zapatilla
+  
+(setq largo(+ (* cantenchufe 4) cantenchufe 3))
+(setq ancho(+ 6.5))
+(setq prof1 (+ 1.7))
+(setq prof2 (+  0.8))
+(setq profundo (+ prof1 prof2 ))
+
+;;;variables auxiliares 
+(setq l(+ (* cantenchufe 4) cantenchufe 0.5))
+(setq a(+ 5.5))
+
+;;;//////////////////////////////////////////////////////////tapa inferior
+
+ (setq p1(list (+ (nth 0 ptoinsercion) l) (+ (nth 1 ptoinsercion) a) (nth 2 ptoinsercion)))
+(command "rectangle" ptoinsercion p1 "")
+(setq e1(entlast))
+
+(command "fillet" "r" "2" "")
+(command "fillet" "p" e1 "" )
+(setq e2(entlast))
+
+;;;esta es la figura la de afuera 
+(command "offset" "0.5" e2 ptoinsercion "") 
+(setq e3(entlast))
+
+(command "extrude" e2 "" "0.7" "" "")
+(setq e4(entlast))
+
+(command "extrude" e3 "" prof2 "" "")
+(setq e5(entlast))
+  
+(command "subtract" e5 "" e4 "")
+(setq entidad1(entlast))
+
+(command "ucs" "y" "" "")
+(setq punto(list (nth 0 ptoinsercion) (nth 1 ptoinsercion)(nth 2 ptoinsercion)))
+(command "rotate" entidad1 "" punto "180")
+(command "ucs" "prev" "" "")
+
+
+;;;///////////////////////////////////////////////////////////// tapa superior
+
+(setq pto1(list (+ (nth 0 ptoinsercion) l) (- (nth 1 ptoinsercion) a) (+(nth 2 ptoinsercion)0)))
+(command "rectangle" ptoinsercion pto1 "")
+(setq ee1(entlast))
+
+(command "fillet" "r" "2" "")
+(command "fillet" "p" ee1 "" )
+(setq ee2(entlast))
+
+(command "offset" "0.5" ee2 ptoinsercion "") 
+(setq ee3(entlast))
+  
+(command "extrude" ee2 "" "1.6" "" "")
+(setq ee4(entlast))
+
+(command "extrude" ee3 "" prof1 "" "")
+(setq ee5(entlast))
+
+(command "subtract" ee5 "" ee4 "")
+(setq entidad2(entlast))
+  
+;;; //////////////////////////////////////////////// pasacable
+
+(command "ucs" "y" "" "")
+
+;;;Delta X = -1.7000,  Delta Y = -2.7500,   Delta Z = 21.0000
+
+(setq ptocable(list (nth 0 ptoinsercion) (- (nth 1 ptoinsercion) 2.7500) (+(nth 2 ptoinsercion)21.000)))
+(setq ptocable2(list (nth 0 ptoinsercion) (- (nth 1 ptoinsercion) 2.7500) (+(nth 2 ptoinsercion)18.000)))
+
+;;;/////////////// perforacion pasacable tapa superior
+(command "circle" ptocable "0.50" "") 
+(setq ec1(entlast))
+(command "extrude" ec1 "" "30" "" "")
+(setq ec2(entlast))
+(command "move" ec2 "" ptocable ptocable2)
+(setq ec3(entlast))
+
+(command "subtract" entidad2 "" ec3"")
+(setq tapasupcable(entlast))
+
+;;;/////////////// perforacion pasacable tapa inferior
+(command "circle" ptocable "0.50" "") 
+(setq ec1(entlast))
+(command "extrude" ec1 "" "30" "" "")
+(setq ec2(entlast))
+(command "move" ec2 "" ptocable ptocable2)
+(setq ec3(entlast))
+
+(command "subtract" entidad1 "" ec3"")
+(setq tapainfcable(entlast))
+  
+(command "ucs" "w" "" "")
+
+;;;//////////////////////////////////////////////////////////////// boton encendido ROTANDOLO.
+
+(setq puntoaux(list (nth 0 ptoinsercion) (- (nth 1 ptoinsercion) 1) (-(nth 2 ptoinsercion)1)))
+(command "rotate" entidadboton "" puntoaux "-90" "")
+
+;;;//////////////////////////////////////////////////////////////////////////////// FIN
+
+(command "zoom" "e")
+)
+
+

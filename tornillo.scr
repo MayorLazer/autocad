@@ -1,0 +1,65 @@
+(defun c:tornillo ()
+  (setq snp (getvar "osmode"))
+  (setvar "osmode" 0)
+
+  (command "-layer" "n" "tornillo" "set" "tornillo" "" )
+  (command "-layer" "color" "120"  "" "" )
+	(setq punto '(0 0 0))
+  	(command  "cone" punto 0.185 -0.3)
+  	(command "cylinder" punto 0.185 1.5)
+  	(setq p1 '(0 0 1.5))
+  	(command "sphere" p1 0.39 )
+  	(setq ent (entlast))
+  	(setq p2 '(-0.39 -0.39 1.5))
+  	(setq p3 '(0.39 0.39 1.5))
+  	(command "box" p2 p3 -0.39)
+  	(setq ent2 (entlast))
+  	(command "subtract" ent "" ent2 "" )
+	(setq ent (entlast))
+  	(setq p2 '(-0.1 -0.39 1.55))
+  	(setq p3 '(0.1 0.39 1.55))
+  	(command "box" p2 p3 0.39)
+  	(setq ent2 (entlast))
+  	(command "subtract" ent "" ent2 "" )
+
+  	(setq i 0)
+  	(setq j 0)
+
+  	(command "-layer" "n" "aux" "set" "aux" "" )
+  	(while (< i 12)
+
+	  (setq p2 (list 0.0 0.0 (+ j (nth 2 punto))) )
+	  (command "torus" p2 0.21 0.05)
+	  (setq j (+ 0.1 j) )
+	  (setq i (+ 1 i))
+	  )
+
+  	(setq i 0)
+  	(setq j 0)
+ 	(setq k 0.21)
+
+	(while (< i 5)
+	  (setq k (- k 0.05))
+	  (setq j (+ 0.1 j) )
+	  (setq p2 (list 0.0 0.0 (- (nth 2 punto) j)) )
+
+	  (command "torus" p2 k 0.05)
+
+	  (setq i (+ 1 i))
+
+	  )
+
+
+  (setq ent (ssget "x" '((8 . "tornillo"))))
+  (setq ent2 (ssget "x" '((8 . "aux"))))
+  (command "subtract" ent "" ent2 "")
+
+
+
+
+
+
+  (setvar "osmode" snp)
+
+
+  )

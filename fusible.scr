@@ -6,6 +6,7 @@
 
   ;<-- Variables -->
   (setq puntoin (list 0 0 0))
+  (setq espacio_tactico 1)
 
   (setq ang_tapita 15)
   (setq tapita_radio 1.5)
@@ -40,7 +41,7 @@
       (setq perforacion (ENTLAST))
 
       ;<-- Fusible -->
-    (setq punto_aux (list (car puntoin) (cadr puntoin) ( + (caddr puntoin) 3 2 ))) ;Para que se vea táctico separado serparo en 2 cm
+    (setq punto_aux (list (car puntoin) (cadr puntoin) ( + (caddr puntoin) 3 espacio_tactico ))) ;Para que se vea táctico separado serparo en 2 cm
     (command "cylinder" punto_aux fusible_radio fusible_radio )
       (setq metal_fusible (ENTLAST))
     (setq punto_aux (list (car puntoin) (cadr puntoin) ( + (caddr punto_aux) fusible_radio )))
@@ -53,7 +54,7 @@
       (setq fusible (ENTLAST))
 
       ;<-- Arandela --> EDITAR DESDE ACA LOS PUNTOS PARA LA CONTUSCCION
-    (setq punto_aux (list (car puntoin) (cadr puntoin) ( + (caddr punto_aux) fusible_radio 2 ))); Para que se vea táctico serparo en 2 cm
+    (setq punto_aux (list (car puntoin) (cadr puntoin) ( + (caddr punto_aux) fusible_radio espacio_tactico ))); Para que se vea táctico serparo en 2 cm
     (command "cylinder" punto_aux arandela_radio arandela_largo "")
       (setq base_arandela (ENTLAST))
 

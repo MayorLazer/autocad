@@ -1,0 +1,46 @@
+(defun c:enchufe1()
+  (setq snp (getvar "osmode"))
+  (setvar "osmode" 0)
+
+  	(command "ucs" "w" "")
+	(setq p1 '(0.0 0.0 0.0))
+  	(command "cylinder" p1 "1.75" "2.0" "")
+  
+  	(setq p2 (list (nth 0 p1) (nth 1 p1) (+ (nth 2 p1) 2.0 )))
+  	(setq p2 (polar p2 0 1.75))
+ 	(setq p3 (list (nth 0 p1) (nth 1 p1) (+ (nth 2 p1) 2.0 )))
+  	(command "fillet" "R" "0.7" "")
+  	(command "fillet" p2 "" "")
+
+  	(command "cylinder" p3 "0.5" "0.5" "")
+  
+;-----------	PATAS	--------------------------------------------------------------
+ 	(setq p2 (list (+ (nth 0 p1) 0.2) (- (nth 1 p1) 0.4 ) (- (nth 2 p1) 0.05)))
+	(setq p3 (list (- (nth 0 p1) 2.0)  (- (nth 1 p1) 0.9)  (- (nth 2 p1) 0.05)))
+  	
+  	(command "ucs" "n" "Y" "-90" "")
+	(command "rectangle"  p2  p3  "-2" "")
+	(setq ent (entlast))
+  	(command "fillet" "R" "0.2" "")
+  	(command "fillet" "P" ent "" "")
+	(setq ent (entlast))
+  	(command "extrude" ent "" "0.05" "0.0" "")
+  	(setq ent (entlast))
+  	(command "ucs" "w" "")
+
+  	(setq punto (list (+ (nth 0 p1) 0.4) (+ (nth 1 p1) 1) (+ (nth 2 p1) 0.2)))
+  	(command "copy" ent "" p1 punto "")
+  	(setq ent (entlast))
+  	(command "rotate" ent "" punto "20" "")
+  	(setq ent (entlast))
+  
+  	(setq p2d (list (nth 0 p1) (nth 1 p1) ))
+  	(setq p2d2 (list (nth 0 p1) (+ 0.2 (nth 1 p1) )))
+  	(command "mirror" ent "" p2d p2d2 "n" "")
+
+  	(command "union" "all" "")
+ 
+  (setvar "osmode" snp)
+
+
+  )

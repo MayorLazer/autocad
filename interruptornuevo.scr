@@ -1,0 +1,65 @@
+(defun c:interruptor()
+  (setq snp (getvar "osmode"))
+  (setvar "osmode" 0)
+  (command "ucs" "w" "")
+  
+  (setq punto (list 0 0 0)) 
+  (setq p1 (list 3.08 2.18 0))
+  (command "rectangle" punto p1 "")
+  (setq ent (entlast))
+  (command "fillet" "r" "0.2" "")
+  (command "fillet" "p" ent "" "")
+  (setq ent (entlast))
+  (command "extrude" ent "" "1.6" "" "")
+
+  (setq p1 (list (- (nth 0 punto) 0.185) (- (nth 1 punto) 0.185) (+ 1.6 (nth 2 punto)) ))
+  (setq p2 (list (+ (nth 0 p1) 3.45) (+ (nth 1 p1) 2.55) (nth 2 p1)) )
+  (command "rectangle" p1 p2 "")
+  (setq ent (entlast))
+
+  (command "fillet" "p" ent "" "")
+  (setq ent (entlast))
+  (command "extrude" ent "" "0.2" "" "")
+  (setq ent (entlast))
+
+  (setq p2 (list 1.54 -1.8 0.15))
+  (command "ucs" "n" "x" "-90" "")
+  (command "cylinder" p2 "1.54" "1.88" "")
+  (setq ent (entlast))
+  (setq p3 (list (+ 1.54 (nth 0 p2) ) (- (nth 1 p2)  4) (nth 2 p2)))
+  (command "cylinder" p3 "4.0" "1.88" "")
+  (setq ent2 (entlast))
+
+  (command "subtract" ent "" ent2 "")
+
+  (command "ucs" "n" "y" "90" "")
+
+  (setq p1 (list -1.555 -0.3 0.72))
+  (setq p2 (list -0.630 1.0 0.72))
+  (command "rectangle" p1 p2 "")
+  (setq ent (entlast))
+  (command "fillet" "r" "0.25" "")
+  (command "fillet" "p" ent "" "")
+  (setq ent (entlast))
+
+
+  
+  (command "extrude" ent "" "0.1" "" "")
+  (setq ent (entlast))
+
+   
+  (setq p1 (list -1.09 0.6 0.67))
+  (command "cylinder" p1 "0.2" "0.5" "")
+  (setq ent3(entlast))
+  (command "subtract" ent "" ent3 "")
+  
+  (command "ucs" "w" "")
+  (setq p2 (list  1.54 0 0))
+  (setq p3 (list 1.54 1.09 0))
+  (setq ent (entlast))
+  (command "mirror" ent "" p2 p3 "n" "")
+  (setq ent2 (entlast))
+  (command "ucs" "w" "")
+  (command "union" "all" "")
+ 
+  )
