@@ -30,15 +30,16 @@
       (setq Perforacion_menor (ENTLAST))
     (command "subtract" Perforacion_mayor "" Perforacion_menor "")
       (setq perforacion (ENTLAST))
-      ;<-- Helice Interna -->
-    (command "helix" puntoin arandela_radio arandela_radio "t" 5 2.9)
-      (setq base_helix (ENTLAST))
-    (command "circle" puntoin 0.08 "")
-      (setq circulo_arandela (ENTLAST))
-    (command "sweep" circulo_arandela "" base_helix "")
-      (setq arandela (ENTLAST))
-    (command "union" arandela perforacion "")
-      (setq perforacion (ENTLAST))
+
+     ;<-- Helice Interna -->
+    (setq punto_aux (list (car puntoin) (cadr puntoin) (caddr puntoin) ))
+    (setq a 0)
+    (while (< a 20)
+
+          (command "torus" punto_aux arandela_radio 0.08)
+          (setq punto_aux (list (car puntoin) (cadr puntoin) (+ (caddr punto_aux) (* 0.08 2)) ))
+      (setq a  (+ a 1))
+    )
 
       ;<-- Fusible -->
     (setq punto_aux (list (car puntoin) (cadr puntoin) ( + (caddr puntoin) 3 espacio_tactico ))) ;Para que se vea táctico separado serparo en 2 cm
@@ -53,22 +54,21 @@
     (command "union" metal_fusible vidrio_fusible metal_fusible2 "")
       (setq fusible (ENTLAST))
 
-      ;<-- Arandela --> EDITAR DESDE ACA LOS PUNTOS PARA LA CONTUSCCION
+      ;<-- Arandela -->
     (setq punto_aux (list (car puntoin) (cadr puntoin) ( + (caddr punto_aux) fusible_radio espacio_tactico ))); Para que se vea táctico serparo en 2 cm
     (command "cylinder" punto_aux arandela_radio arandela_largo "")
       (setq base_arandela (ENTLAST))
 
-    (command "helix" punto_aux arandela_radio arandela_radio "t" 2.9 arandela_largo)
-      (setq helix (ENTLAST))
-    (command "circle" puntoin 0.08 "")
-      (setq circulo_arandela (ENTLAST))
-    (command "sweep" circulo_arandela "" helix "")
-      (setq helice (ENTLAST))
-    (command "union" base_arandela helice "")
-      (setq arandela (ENTLAST))
+    (setq a 0)
+    (while (< a 5)
+
+          (command "torus" punto_aux arandela_radio 0.08)
+          (setq punto_aux (list (car puntoin) (cadr puntoin) (+ (caddr punto_aux) (* 0.08 2)) ))
+      (setq a  (+ a 1))
+    )
 
       ;<-- Tapita -->
-    (setq punto_aux (list (car puntoin) (cadr puntoin) ( + (caddr punto_aux) arandela_largo)))
+    (setq punto_aux (list (car puntoin) (cadr puntoin) (caddr punto_aux) ))
     (command "circle" punto_aux tapita_radio "")
       (setq circulo_tapita (ENTLAST))
     (command "extrude" circulo_tapita "" "t" ang_tapita tapita_largo "")

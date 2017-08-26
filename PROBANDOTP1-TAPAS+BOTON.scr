@@ -1,4 +1,4 @@
-(defun C:ba()
+(defun c:ba ()
 
 (setq snp(getvar "osmode"))
 (setvar "osmode" 0)
@@ -15,8 +15,8 @@
   (setq snp (getvar "osmode"))
   (setvar "osmode" 0)
   (command "ucs" "w" "")
-  
-  (setq punto (list 0 0 0)) 
+
+  (setq punto (list 0 0 0))
   (setq p1 (list 3.08 2.18 0))
   (command "rectangle" punto p1 "")
   (setq ent1 (entlast))
@@ -62,7 +62,7 @@
   (setq ent11(entlast))
   (command "subtract" ent10 "" ent11 "")
   (setq ent12(entlast))
-  
+
   (command "ucs" "w" "")
   (setq p2 (list  1.54 0 0))
   (setq p3 (list 1.54 1.09 0))
@@ -72,9 +72,9 @@
   (command "ucs" "w" "")
   (command "union" "all" "")
   (setq entidadboton (entlast))
- 
+
 ;;;//////////////////////////////////////////////////////////////////////////////////////////////// ZAPATILLA BELU
-  
+
 
 ;;;eje en x / eje y de la zapatilla vendria a ser
 ;;;1 es la distancia entre conectores x
@@ -82,14 +82,14 @@
 ;;;prof1 es la tapa superior
 ;;;prof2 es la tapa inferior
 ;;;profundo es el profundo total de la zapatilla
-  
+
 (setq largo(+ (* cantenchufe 4) cantenchufe 3))
 (setq ancho(+ 6.5))
 (setq prof1 (+ 1.7))
 (setq prof2 (+  0.8))
 (setq profundo (+ prof1 prof2 ))
 
-;;;variables auxiliares 
+;;;variables auxiliares
 (setq l(+ (* cantenchufe 4) cantenchufe 0.5))
 (setq a(+ 5.5))
 
@@ -103,8 +103,8 @@
 (command "fillet" "p" e1 "" )
 (setq e2(entlast))
 
-;;;esta es la figura la de afuera 
-(command "offset" "0.5" e2 ptoinsercion "") 
+;;;esta es la figura la de afuera
+(command "offset" "0.5" e2 ptoinsercion "")
 (setq e3(entlast))
 
 (command "extrude" e2 "" "0.7" "" "")
@@ -112,7 +112,7 @@
 
 (command "extrude" e3 "" prof2 "" "")
 (setq e5(entlast))
-  
+
 (command "subtract" e5 "" e4 "")
 (setq entidad1(entlast))
 
@@ -132,9 +132,9 @@
 (command "fillet" "p" ee1 "" )
 (setq ee2(entlast))
 
-(command "offset" "0.5" ee2 ptoinsercion "") 
+(command "offset" "0.5" ee2 ptoinsercion "")
 (setq ee3(entlast))
-  
+
 (command "extrude" ee2 "" "1.6" "" "")
 (setq ee4(entlast))
 
@@ -143,7 +143,7 @@
 
 (command "subtract" ee5 "" ee4 "")
 (setq entidad2(entlast))
-  
+
 ;;; //////////////////////////////////////////////// pasacable
 
 (command "ucs" "y" "" "")
@@ -154,7 +154,7 @@
 (setq ptocable2(list (nth 0 ptoinsercion) (- (nth 1 ptoinsercion) 2.7500) (+(nth 2 ptoinsercion)18.000)))
 
 ;;;/////////////// perforacion pasacable tapa superior
-(command "circle" ptocable "0.50" "") 
+(command "circle" ptocable "0.50" "")
 (setq ec1(entlast))
 (command "extrude" ec1 "" "30" "" "")
 (setq ec2(entlast))
@@ -165,7 +165,7 @@
 (setq tapasupcable(entlast))
 
 ;;;/////////////// perforacion pasacable tapa inferior
-(command "circle" ptocable "0.50" "") 
+(command "circle" ptocable "0.50" "")
 (setq ec1(entlast))
 (command "extrude" ec1 "" "30" "" "")
 (setq ec2(entlast))
@@ -174,7 +174,7 @@
 
 (command "subtract" entidad1 "" ec3"")
 (setq tapainfcable(entlast))
-  
+
 (command "ucs" "w" "" "")
 
 ;;;//////////////////////////////////////////////////////////////// boton encendido ROTANDOLO.
@@ -186,5 +186,3 @@
 
 (command "zoom" "e")
 )
-
-
